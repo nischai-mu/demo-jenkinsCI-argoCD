@@ -18,6 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh """
+                docker system prune -a -y
                 docker build -t ${REPO_NAME}:${IMAGE_TAG} .
                 """
             }
