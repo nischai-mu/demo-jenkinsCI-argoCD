@@ -15,12 +15,15 @@ pipeline {
 
     stages {
 
+        stage('Cleanup Docker') {
+            steps {
+                sh 'docker system prune -a -f || true'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh """
-                docker system prune -a -y
-                docker build -t ${REPO_NAME}:${IMAGE_TAG} .
-                """
+                sh "docker build -t ${REPO_NAME}:${IMAGE_TAG} ."
             }
         }
 
@@ -44,13 +47,8 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                sh """
-                docker push ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}
-                """
+                sh "docker push ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}"
             }
         }
     }
 }
-
-
-
