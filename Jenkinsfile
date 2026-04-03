@@ -6,6 +6,7 @@ pipeline {
         ACCOUNT_ID = "949185033669"
         REPO_NAME = "demo-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
+        ECR_REGISTRY = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
 
     triggers {
@@ -17,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh """
-                docker build -t $REPO_NAME:$IMAGE_TAG .
+                docker build -t ${REPO_NAME}:${IMAGE_TAG} .
                 """
             }
         }
@@ -25,9 +26,8 @@ pipeline {
         stage('Authenticate to ECR') {
             steps {
                 sh """
-                aws ecr get-login-password --region $AWS_REGION | \
-                docker login --username AWS --password-stdin \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+                aws ecr get-login-password --region ${AWS_REGION} | \
+                docker login --username AWS --password-stdin ${ECR_REGISTRY}
                 """
             }
         }
@@ -35,8 +35,8 @@ pipeline {
         stage('Tag Image') {
             steps {
                 sh """
-                docker tag $REPO_NAME:$IMAGE_TAG \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+                docker tag ${REPO_NAME}:${IMAGE_TAG} \
+                ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}
                 """
             }
         }
@@ -44,8 +44,7 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 sh """
-                docker push \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+                docker push ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}
                 """
             }
         }
