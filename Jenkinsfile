@@ -12,7 +12,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/nischai-mu/demo-jenkinsCI-argoCD.git'
+                git clone 'https://github.com/nischai-mu/demo-jenkinsCI-argoCD.git'
             }
         }
 
