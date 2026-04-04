@@ -3,10 +3,8 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        ACCOUNT_ID = "949185033669"
         REPO_NAME = "demo-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        ECR_REGISTRY = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
 
     triggers {
@@ -27,27 +25,25 @@ pipeline {
             }
         }
 
-        stage('Authenticate to ECR') {
+        stage('Authenticate, Tag & Push to ECR') {
             steps {
-                sh """
-                aws ecr get-login-password --region ${AWS_REGION} | \
-                docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                """
-            }
-        }
+                withCredentials([string(credentialsId: 'aws-account-id', variable: 'ACCOUNT_ID')]) {
+                    sh '''
+                    # Construct ECR registry dynamically
+                    ECR_REGISTRY=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-        stage('Tag Image') {
-            steps {
-                sh """
-                docker tag ${REPO_NAME}:${IMAGE_TAG} \
-                ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}
-                """
-            }
-        }
+                    echo "Logging into ECR..."
+                    aws ecr get-login-password --region ${AWS_REGION} | \
+                    docker login --username AWS --password-stdin $ECR_REGISTRY
 
-        stage('Push to ECR') {
-            steps {
-                sh "docker push ${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}"
+                    echo "Tagging Docker image..."
+                    docker tag ${REPO_NAME}:${IMAGE_TAG} \
+                    $ECR_REGISTRY/${REPO_NAME}:${IMAGE_TAG}
+
+                    echo "Pushing image to ECR..."
+                    docker push $ECR_REGISTRY/${REPO_NAME}:${IMAGE_TAG}
+                    '''
+                }
             }
         }
     }
