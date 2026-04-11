@@ -46,6 +46,19 @@ pipeline {
                 }
             }
         }
+        stage('Trigger GitLab CD') {
+           steps {
+              withCredentials([string(credentialsId: 'gitlab-trigger-token', variable: 'GITLAB_TRIGGER_TOKEN')]) {
+                  sh """
+                  curl -X POST \
+                  --form token=${GITLAB_TRIGGER_TOKEN} \
+                  --form ref=main \
+                  --form variables[IMAGE_TAG]=${IMAGE_TAG} \
+                  "https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/trigger/pipeline"
+                  """
+                  }
+              }
+         }
     }
 }
 
