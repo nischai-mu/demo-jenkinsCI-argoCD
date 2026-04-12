@@ -54,7 +54,7 @@ pipeline {
                   --form token=${GITLAB_TRIGGER_TOKEN} \
                   --form ref=main \
                   --form variables[IMAGE_TAG]=${IMAGE_TAG} \
-                  "https://gitlab.com/api/v4/projects/81211428/trigger/pipeline"
+                  "https://gitlab.com/api/v4/projects/81231210/trigger/pipeline"
                   """
                   }
               }
