@@ -46,19 +46,19 @@ pipeline {
                 }
             }
         }
-        stage('Trigger GitLab CD') {
+        stage('Trigger GitHub Actions CD') {
            steps {
-              withCredentials([string(credentialsId: 'gitlab-trigger-token', variable: 'GITLAB_TRIGGER_TOKEN')]) {
+              withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
                   sh """
                   curl -X POST \
-                  --form token=${GITLAB_TRIGGER_TOKEN} \
-                  --form ref=main \
-                  --form variables[IMAGE_TAG]=${IMAGE_TAG} \
-                  "https://gitlab.com/api/v4/projects/81234850/trigger/pipeline"
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -H "Authorization: token ${GITHUB_TOKEN}" \
+                  https://api.github.com/repos/nischai-mu/argocd-cd-pipeline/dispatches \
+                  -d '{"event_type":"deploy","client_payload":{"image_tag":"${IMAGE_TAG}"}}'
                   """
-                  }
               }
-         }
+           }
+        }
     }
 }
 
