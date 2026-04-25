@@ -6,12 +6,12 @@ const html = `
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My DevOps App v1</title>
+  <title>My DevOps App v2</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #141e30, #243b55);
       color: white;
       height: 100vh;
       display: flex;
@@ -20,38 +20,45 @@ const html = `
     }
 
     .card {
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
       padding: 40px;
       border-radius: 20px;
-      width: 420px;
+      width: 450px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
     }
 
     h1 {
       margin-bottom: 10px;
     }
 
-    .status {
-      display: inline-block;
-      padding: 5px 12px;
-      background: #00c853;
-      border-radius: 20px;
-      font-size: 12px;
-      margin-top: 10px;
+    button {
+      margin-top: 20px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      background: #00e676;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    .time {
+    button:hover {
+      background: #69f0ae;
+    }
+
+    .output {
       margin-top: 20px;
       font-size: 14px;
-      color: #ffe082;
+      color: #ffd54f;
     }
 
-    .tag {
-      margin-top: 20px;
-      font-size: 13px;
-      opacity: 0.8;
+    .badge {
+      background: #ff1744;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -59,21 +66,27 @@ const html = `
 
   <div class="card">
     <h1>🚀 DevOps Dashboard</h1>
-    <div class="status">SYSTEM ONLINE</div>
 
-    <p class="tag">CI/CD Pipeline: Jenkins → Docker → ECR → K8s</p>
+    <div class="badge">VERSION 2</div>
 
-    <div class="time">
-      Live Time: <span id="time"></span>
-    </div>
+    <p>CI/CD Pipeline: Jenkins → Docker → ECR → Kubernetes</p>
+
+    <button onclick="getUpdate()">🔥 Get Deployment Update</button>
+
+    <div class="output" id="output"></div>
   </div>
 
   <script>
-    function updateTime() {
-      document.getElementById("time").innerText = new Date().toLocaleString();
+    function getUpdate() {
+      fetch('/api')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("output").innerHTML =
+            "✔ Message: " + data.message + "<br>" +
+            "⏱ Time: " + data.time + "<br>" +
+            "🚀 Version: " + data.version;
+        });
     }
-    setInterval(updateTime, 1000);
-    updateTime();
   </script>
 
 </body>
@@ -81,10 +94,21 @@ const html = `
 `;
 
 const server = http.createServer((req, res) => {
+
+  if (req.url === "/api") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      message: "🔥 NEW FEATURE DEPLOYED VIA CI/CD PIPELINE",
+      time: new Date(),
+      version: "v2"
+    }));
+    return;
+  }
+
   res.writeHead(200, { "Content-Type": "text/html" });
   res.end(html);
 });
 
 server.listen(PORT, () => {
-  console.log("v1 running on port", PORT);
+  console.log("v2 running on port", PORT);
 });
