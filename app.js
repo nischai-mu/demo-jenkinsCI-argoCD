@@ -1,6 +1,7 @@
 const http = require("http");
 
 const PORT = 3000;
+const VERSION = "v3"; // 👈 CHANGE THIS EVERY TIME
 
 const html = `
 <!DOCTYPE html>
@@ -10,144 +11,70 @@ const html = `
   <title>DevOps Dashboard</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      height: 100vh;
+      font-family: Arial, sans-serif;
+      background: black;
+      color: lime;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
+      height: 100vh;
     }
 
-    .card {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(15px);
-      padding: 40px;
-      border-radius: 20px;
-      width: 420px;
+    .box {
+      border: 3px solid lime;
+      padding: 30px;
       text-align: center;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-      animation: fadeIn 0.8s ease-in-out;
+      width: 400px;
     }
 
     h1 {
-      margin-bottom: 15px;
-      font-size: 28px;
+      color: yellow;
+      font-size: 30px;
     }
 
-    .status {
-      display: inline-block;
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-
-    .online {
-      background: #00e676;
-      color: #003300;
-    }
-
-    .offline {
-      background: #ff1744;
-      color: white;
-    }
-
-    p {
-      font-size: 15px;
-      opacity: 0.9;
-    }
-
-    .time {
-      margin-top: 10px;
-      color: #ffd54f;
-      font-weight: bold;
+    .version {
+      font-size: 22px;
+      margin: 15px 0;
+      color: cyan;
     }
 
     button {
-      margin-top: 25px;
-      padding: 12px 20px;
+      padding: 10px 15px;
+      background: lime;
       border: none;
-      border-radius: 12px;
-      background: #00e676;
-      color: black;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      background: #69f0ae;
+      font-weight: bold;
     }
 
     .output {
       margin-top: 20px;
-      font-size: 14px;
-      color: #fff176;
-      line-height: 1.6;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      color: white;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="card">
-    <h1>🚀 DevOps Dashboard</h1>
+  <div class="box">
+    <h1>⚡ NEW UI LOADED</h1>
 
-    <div id="statusBadge" class="status online">SYSTEM ONLINE</div>
+    <div class="version">VERSION: ${VERSION}</div>
 
-    <p>CI/CD Pipeline: Jenkins → Docker → ECR → Kubernetes</p>
-
-    <div class="time" id="time"></div>
-
-    <button onclick="getUpdate()">🔥 Get Deployment Update</button>
+    <button onclick="getData()">CHECK API</button>
 
     <div class="output" id="output"></div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("time").innerText =
-        "Live Time: " + now.toLocaleString();
-    }
-
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    function getUpdate() {
+    function getData() {
       fetch('/api')
         .then(res => res.json())
         .then(data => {
           document.getElementById("output").innerHTML =
-            "✔ Message: " + data.message + "<br>" +
-            "⏱ Time: " + new Date(data.time).toLocaleString() + "<br>" +
-            "🚀 Version: " + data.version;
-
-          // simulate status toggle (optional)
-          const badge = document.getElementById("statusBadge");
-          badge.classList.remove("offline");
-          badge.classList.add("online");
-          badge.innerText = "SYSTEM ONLINE";
-        })
-        .catch(() => {
-          const badge = document.getElementById("statusBadge");
-          badge.classList.remove("online");
-          badge.classList.add("offline");
-          badge.innerText = "SYSTEM OFFLINE";
+            "Message: " + data.message + "<br>" +
+            "Time: " + new Date(data.time).toLocaleString();
         });
     }
   </script>
@@ -158,12 +85,17 @@ const html = `
 
 const server = http.createServer((req, res) => {
 
+  // ❗ DISABLE CACHE COMPLETELY
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
   if (req.url === "/api") {
     res.writeHead(200, { "Content-Type": "application/json; charset=UTF-8" });
     res.end(JSON.stringify({
-      message: "🔥 NEW FEATURE DEPLOYED VIA CI/CD PIPELINE",
+      message: "🔥 YOU ARE SEEING LATEST VERSION",
       time: new Date(),
-      version: "v2"
+      version: "${VERSION}"
     }));
     return;
   }
@@ -173,5 +105,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log("🚀 DevOps Dashboard running on port", PORT);
+  console.log("Running version:", VERSION);
 });
