@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IRON REALM — v1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=IM+Fell+English&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0a06;
+  --surface:#13100a;
+  --card:#1a1510;
+  --border:#3d2e1a;
+  --gold:#c9920a;
+  --gold2:#f0c040;
+  --red:#c0392b;
+  --green:#27ae60;
+  --blue:#2980b9;
+  --text:#e8dcc8;
+  --muted:#7a6a50;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IM Fell English',serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(201,146,10,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(192,57,43,0.04) 0%, transparent 60%);
+}
+.game-container{
+  width:100%;max-width:680px;
+  background:var(--surface);
+  border:2px solid var(--border);
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.5);
+  position:relative;
+}
+.game-container::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.01'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;
+}
+.title-bar{
+  background:linear-gradient(180deg,#1f1a10,#13100a);
+  border-bottom:2px solid var(--border);
+  padding:1rem 1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+  position:relative;z-index:1;
+}
+.game-title{
+  font-family:'Cinzel',serif;
+  font-size:1.6rem;font-weight:900;
+  color:var(--gold2);
+  letter-spacing:0.1em;
+  text-shadow:0 0 20px rgba(201,146,10,0.5);
+}
+.version{
+  font-family:monospace;font-size:10px;
+  color:var(--muted);letter-spacing:0.1em;
+  border:1px solid var(--border);padding:3px 8px;border-radius:3px;
+}
+.stats-bar{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:1px;background:var(--border);
+  border-bottom:2px solid var(--border);
+  position:relative;z-index:1;
+}
+.stat{
+  background:var(--card);
+  padding:0.6rem 1rem;
+  display:flex;flex-direction:column;gap:3px;
+}
+.stat-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.stat-val{font-family:'Cinzel',serif;font-size:15px;font-weight:700;}
+.bar-wrap{height:6px;background:rgba(0,0,0,0.5);border-radius:3px;margin-top:2px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease;}
+.hp-fill{background:linear-gradient(90deg,#c0392b,#e74c3c);}
+.mp-fill{background:linear-gradient(90deg,#2980b9,#3498db);}
+.xp-fill{background:linear-gradient(90deg,#c9920a,#f0c040);}
+.scene{
+  min-height:220px;padding:1.5rem;
+  position:relative;z-index:1;
+  border-bottom:1px solid var(--border);
+}
+.scene-location{
+  font-size:10px;color:var(--muted);letter-spacing:0.15em;
+  text-transform:uppercase;margin-bottom:0.5rem;
+}
+.scene-art{
+  font-size:3.5rem;text-align:center;padding:0.5rem 0;
+  filter:drop-shadow(0 0 12px rgba(201,146,10,0.3));
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.scene-text{
+  font-size:1rem;line-height:1.8;color:var(--text);
+  min-height:80px;
+}
+.scene-text .highlight{color:var(--gold2);}
+.scene-text .danger{color:var(--red);}
+.scene-text .success{color:var(--green);}
+.log{
+  background:rgba(0,0,0,0.3);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:0.5rem 0.75rem;
+  margin-top:0.75rem;
+  font-size:12px;
+  color:var(--muted);
+  min-height:40px;
+  font-style:italic;
+}
+.actions{
+  padding:1rem 1.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;
+  position:relative;z-index:1;
+}
+.btn{
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:0.65rem 1rem;
+  font-family:'IM Fell English',serif;
+  font-size:14px;
+  cursor:pointer;
+  border-radius:3px;
+  transition:all 0.15s;
+  text-align:left;
+  display:flex;align-items:center;gap:8px;
+}
+.btn:hover:not(:disabled){
+  background:#211a0e;
+  border-color:var(--gold);
+  color:var(--gold2);
+  box-shadow:0 0 10px rgba(201,146,10,0.15);
+}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-icon{font-size:18px;}
+.btn-attack{border-color:#5a2020;}
+.btn-attack:hover:not(:disabled){border-color:var(--red);color:#e74c3c;box-shadow:0 0 10px rgba(192,57,43,0.2);}
+.enemy-section{
+  padding:0 1.5rem 1rem;
+  position:relative;z-index:1;
+  display:none;
+}
+.enemy-card{
+  background:var(--card);
+  border:1px solid #5a2020;
+  border-radius:3px;
+  padding:0.75rem 1rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.enemy-sprite{font-size:2.5rem;animation:shake 0.5s ease infinite alternate;}
+@keyframes shake{0%{transform:rotate(-3deg);}100%{transform:rotate(3deg);}}
+.enemy-info{flex:1;}
+.enemy-name{font-family:'Cinzel',serif;font-size:14px;color:#e74c3c;margin-bottom:4px;}
+.enemy-hp-bar{height:8px;background:rgba(0,0,0,0.5);border-radius:4px;overflow:hidden;}
+.enemy-hp-fill{height:100%;background:linear-gradient(90deg,#922b21,#c0392b);transition:width 0.3s;}
+.footer-bar{
+  background:var(--card);border-top:1px solid var(--border);
+  padding:0.4rem 1.5rem;
+  display:flex;justify-content:space-between;
+  font-size:10px;color:var(--muted);
+  font-family:monospace;letter-spacing:0.05em;
+  position:relative;z-index:1;
+}
+.start-overlay{
+  position:absolute;inset:0;
+  background:rgba(13,10,6,0.97);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:50;padding:2rem;text-align:center;
+}
+.so-title{
+  font-family:'Cinzel',serif;font-size:2.8rem;font-weight:900;
+  color:var(--gold2);letter-spacing:0.1em;
+  text-shadow:0 0 30px rgba(201,146,10,0.6);
+  margin-bottom:0.25rem;
+}
+.so-sub{color:var(--muted);font-size:13px;letter-spacing:0.1em;margin-bottom:2rem;}
+.btn-begin{
+  background:linear-gradient(135deg,#8a6200,#c9920a);
+  color:#0d0a06;border:none;
+  padding:14px 48px;
+  font-family:'Cinzel',serif;font-size:15px;font-weight:700;
+  letter-spacing:0.15em;border-radius:3px;cursor:pointer;
+  transition:all 0.2s;margin-bottom:1.5rem;
+}
+.btn-begin:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,146,10,0.4);}
+.lore{color:var(--muted);font-size:13px;line-height:2;max-width:400px;}
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="title-bar">
+    <div class="game-title">⚔ IRON REALM</div>
+    <div class="version">v1.0 · JENKINS CI/CD</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-label">❤ Health</span>
+      <span class="stat-val" id="hpVal">100 / 100</span>
+      <div class="bar-wrap"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
+    </div>
+    <div class="stat">
+      <span class="stat-label">✦ Mana</span>
+      <span class="stat-val" id="mpVal">50 / 50</span>
+      <div class="bar-wrap"><div class="bar-fill mp-fill" id="mpBar" style="width:100%"></div></div>
+    </div>
+    <div class="stat">
+      <span class="stat-label">★ Level / XP</span>
+      <span class="stat-val" id="xpVal">Lv.1 — 0 XP</span>
+      <div class="bar-wrap"><div class="bar-fill xp-fill" id="xpBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-location" id="location">🏰 THE DARK FOREST — ENTRANCE</div>
+    <div class="scene-art" id="sceneArt">🌲</div>
+    <div class="scene-text" id="sceneText">You stand at the edge of the <span class="highlight">Dark Forest</span>. The trees whisper ancient warnings. A narrow path disappears into the shadows ahead. Your sword glints in the pale moonlight...</div>
+    <div class="log" id="log">Awaiting your command, adventurer...</div>
+  </div>
+
+  <div class="enemy-section" id="enemySection">
+    <div class="enemy-card">
+      <div class="enemy-sprite" id="enemySprite">👹</div>
+      <div class="enemy-info">
+        <div class="enemy-name" id="enemyName">GOBLIN SCOUT</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;" id="enemyHPText">HP: 30 / 30</div>
+        <div class="enemy-hp-bar"><div class="enemy-hp-fill" id="enemyHPBar" style="width:100%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actions"></div>
+
+  <div class="footer-bar">
+    <span>IRON REALM v1.0</span>
+    <span>Jenkins → Docker → ECR → K8s</span>
+  </div>
+
+  <div class="start-overlay" id="startOverlay">
+    <div class="so-title">⚔ IRON REALM</div>
+    <div class="so-sub">// DEPLOYED VIA JENKINS CI/CD PIPELINE — v1.0</div>
+    <button class="btn-begin" id="beginBtn">BEGIN ADVENTURE</button>
+    <div class="lore">
+      The kingdom of Aldrath has fallen into darkness.<br/>
+      Ancient evil stirs in the depths of the Iron Realm.<br/>
+      Only a brave soul can restore the light.
+    </div>
+  </div>
+</div>
+
+<script>
+const G = {
+  hp:100,maxHp:100,mp:50,maxMp:50,
+  level:1,xp:0,xpNext:100,
+  gold:0,state:'explore',
+  scene:0,
+  enemy:null,
+};
+
+const ENEMIES=[
+  {name:'GOBLIN SCOUT',sprite:'👺',hp:30,maxHp:30,atk:8,xp:20,gold:5},
+  {name:'DARK WOLF',sprite:'🐺',hp:45,maxHp:45,atk:12,xp:35,gold:8},
+  {name:'ORC WARRIOR',sprite:'👹',sprite:'👹',hp:70,maxHp:70,atk:18,xp:60,gold:15},
+  {name:'SKELETON MAGE',sprite:'💀',hp:55,maxHp:55,atk:22,xp:75,gold:20},
+];
+
+const SCENES=[
+  {loc:'🌲 DARK FOREST — ENTRANCE',art:'🌲',text:'You stand at the edge of the <span class="highlight">Dark Forest</span>. The trees whisper ancient warnings. A narrow path disappears into the shadows ahead.',
+   actions:[{icon:'⚔️',label:'Venture deeper',fn:'advance'},{icon:'🔍',label:'Search surroundings',fn:'search'},{icon:'🧪',label:'Rest & recover',fn:'rest'}]},
+  {loc:'🌑 DEEP FOREST — THE CLEARING',art:'🌕',text:'A moonlit clearing opens before you. Ancient stone ruins jut from the earth, covered in <span class="danger">dark runes</span>. Something moves in the shadows...',
+   actions:[{icon:'⚔️',label:'Fight the shadow',fn:'fight'},{icon:'📜',label:'Read the runes',fn:'lore'},{icon:'🏃',label:'Press onward',fn:'advance'}]},
+  {loc:'🏚 THE RUINED KEEP',art:'🏰',text:'A crumbling keep looms ahead. The gates hang open. Inside, torchlight flickers. You hear <span class="danger">growling from within</span>. This is the heart of the darkness.',
+   actions:[{icon:'⚔️',label:'Enter & fight',fn:'fight'},{icon:'🧪',label:'Use a potion',fn:'potion'},{icon:'🔮',label:'Cast a spell',fn:'spell'}]},
+];
+
+function updateHUD(){
+  const hpPct=Math.max(0,G.hp/G.maxHp*100);
+  const mpPct=Math.max(0,G.mp/G.maxMp*100);
+  const xpPct=Math.min(100,G.xp/G.xpNext*100);
+  document.getElementById('hpVal').textContent=`${Math.max(0,G.hp)} / ${G.maxHp}`;
+  document.getElementById('mpVal').textContent=`${Math.max(0,G.mp)} / ${G.maxMp}`;
+  document.getElementById('xpVal').textContent=`Lv.${G.level} — ${G.xp} XP`;
+  document.getElementById('hpBar').style.width=hpPct+'%';
+  document.getElementById('mpBar').style.width=mpPct+'%';
+  document.getElementById('xpBar').style.width=xpPct+'%';
+}
+
+function setLog(msg){document.getElementById('log').textContent=msg;}
+
+function loadScene(idx){
+  const s=SCENES[Math.min(idx,SCENES.length-1)];
+  document.getElementById('location').textContent=s.loc;
+  document.getElementById('sceneArt').textContent=s.art;
+  document.getElementById('sceneText').innerHTML=s.text;
+  document.getElementById('enemySection').style.display='none';
+  renderActions(s.actions);
+}
+
+function renderActions(acts){
+  const d=document.getElementById('actions');
+  d.innerHTML='';
+  acts.forEach(a=>{
+    const b=document.createElement('button');
+    b.className='btn'+(a.fn==='fight'||a.fn==='attack'?' btn-attack':'');
+    b.innerHTML=`<span class="btn-icon">${a.icon}</span>${a.label}`;
+    b.onclick=()=>ACTIONS[a.fn]&&ACTIONS[a.fn]();
+    d.appendChild(b);
+  });
+}
+
+function spawnEnemy(){
+  const e=ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+  G.enemy={...e};
+  document.getElementById('enemySection').style.display='block';
+  document.getElementById('enemySprite').textContent=G.enemy.sprite;
+  document.getElementById('enemyName').textContent=G.enemy.name;
+  updateEnemyHP();
+  G.state='battle';
+  renderActions([
+    {icon:'⚔️',label:'Attack!',fn:'attack'},
+    {icon:'🔮',label:'Cast spell (10 MP)',fn:'spell'},
+    {icon:'🧪',label:'Use potion',fn:'potion'},
+    {icon:'🏃',label:'Flee',fn:'flee'},
+  ]);
+}
+
+function updateEnemyHP(){
+  const pct=Math.max(0,G.enemy.hp/G.enemy.maxHp*100);
+  document.getElementById('enemyHPBar').style.width=pct+'%';
+  document.getElementById('enemyHPText').textContent=`HP: ${Math.max(0,G.enemy.hp)} / ${G.enemy.maxHp}`;
+}
+
+function enemyAttack(){
+  const dmg=G.enemy.atk+Math.floor(Math.random()*6)-3;
+  G.hp=Math.max(0,G.hp-dmg);
+  setLog(`${G.enemy.name} strikes you for ${dmg} damage!`);
+  updateHUD();
+  if(G.hp<=0){setLog('⚰ You have fallen in battle...');renderActions([{icon:'🔄',label:'Rise again',fn:'restart'}]);}
+}
+
+function gainXP(amt){
+  G.xp+=amt;
+  if(G.xp>=G.xpNext){
+    G.level++;G.xp=0;G.xpNext=Math.floor(G.xpNext*1.5);
+    G.maxHp+=15;G.hp=G.maxHp;G.maxMp+=10;G.mp=G.maxMp;
+    setLog(`⭐ LEVEL UP! You are now Level ${G.level}! Stats increased!`);
+  }
+  updateHUD();
+}
+
+const ACTIONS={
+  advance(){G.scene=Math.min(G.scene+1,SCENES.length-1);loadScene(G.scene);setLog('You press deeper into the realm...');},
+  search(){
+    const r=Math.random();
+    if(r<0.4){G.gold+=10;setLog('🪙 You found 10 gold hidden in the roots!');}
+    else if(r<0.7){G.hp=Math.min(G.maxHp,G.hp+15);setLog('🌿 You found healing herbs. Restored 15 HP!');updateHUD();}
+    else setLog('Nothing here but shadows and silence...');
+  },
+  rest(){
+    G.hp=Math.min(G.maxHp,G.hp+20);G.mp=Math.min(G.maxMp,G.mp+10);
+    setLog('🔥 You rest by a campfire. Restored 20 HP & 10 MP.');updateHUD();
+  },
+  fight(){spawnEnemy();setLog(`A ${G.enemy.name} blocks your path!`);},
+  lore(){setLog('📜 The runes read: "Only the worthy may claim the Iron Crown."');},
+  attack(){
+    const dmg=10+G.level*3+Math.floor(Math.random()*8);
+    G.enemy.hp=Math.max(0,G.enemy.hp-dmg);
+    updateEnemyHP();
+    setLog(`⚔️ You strike for ${dmg} damage!`);
+    if(G.enemy.hp<=0){
+      setLog(`✅ ${G.enemy.name} defeated! +${G.enemy.xp} XP, +${G.enemy.gold} gold`);
+      G.gold+=G.enemy.gold;gainXP(G.enemy.xp);
+      document.getElementById('enemySection').style.display='none';
+      G.state='explore';loadScene(G.scene);
+    } else {enemyAttack();}
+  },
+  spell(){
+    if(G.mp<10){setLog('❌ Not enough mana!');return;}
+    G.mp-=10;
+    const dmg=25+G.level*5+Math.floor(Math.random()*10);
+    G.enemy.hp=Math.max(0,G.enemy.hp-dmg);
+    updateHUD();updateEnemyHP();
+    setLog(`🔮 Your spell blasts for ${dmg} damage!`);
+    if(G.enemy.hp<=0){
+      setLog(`✅ ${G.enemy.name} defeated! +${G.enemy.xp} XP, +${G.enemy.gold} gold`);
+      G.gold+=G.enemy.gold;gainXP(G.enemy.xp);
+      document.getElementById('enemySection').style.display='none';
+      G.state='explore';loadScene(G.scene);
+    } else {enemyAttack();}
+  },
+  potion(){G.hp=Math.min(G.maxHp,G.hp+35);setLog('🧪 You quaff a potion! Restored 35 HP.');updateHUD();},
+  flee(){
+    G.state='explore';
+    document.getElementById('enemySection').style.display='none';
+    loadScene(G.scene);setLog('🏃 You flee into the darkness...');
+  },
+  restart(){
+    G.hp=G.maxHp;G.mp=G.maxMp;G.state='explore';
+    updateHUD();loadScene(G.scene);setLog('You rise again, determined...');
+  }
+};
+
+document.getElementById('beginBtn').onclick=()=>{
+  document.getElementById('startOverlay').style.display='none';
+  loadScene(0);updateHUD();
+};
+updateHUD();
+</script>
+</body>
+</html>
