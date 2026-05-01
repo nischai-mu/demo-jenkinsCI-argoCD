@@ -3,484 +3,372 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>IRON REALM — v2.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IM+Fell+English&display=swap" rel="stylesheet"/>
+<title>VOID STRIKE — Play & Compete</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d0a06;--surface:#13100a;--card:#1a1510;--border:#3d2e1a;
-  --gold:#c9920a;--gold2:#f0c040;--red:#c0392b;--green:#27ae60;
-  --blue:#2980b9;--purple:#8e44ad;--text:#e8dcc8;--muted:#7a6a50;
+  --bg:#03020a;--surface:#0a0914;--card:#0f0e1c;--border:#1a1830;
+  --gold:#f0c040;--gold2:#ffd700;--accent:#00ffcc;--danger:#ff3860;
+  --text:#e8e0ff;--muted:#4a4560;
 }
 body{
-  background:var(--bg);color:var(--text);font-family:'IM Fell English',serif;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
   padding:1rem;
-  background-image:radial-gradient(ellipse at 20% 50%,rgba(201,146,10,0.05) 0%,transparent 60%),
-    radial-gradient(ellipse at 80% 20%,rgba(142,68,173,0.05) 0%,transparent 60%);
+  background-image:
+    radial-gradient(ellipse at 20% 20%,rgba(0,255,204,0.04) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(240,192,64,0.04) 0%,transparent 50%);
 }
-.game-container{
-  width:100%;max-width:720px;
-  background:var(--surface);border:2px solid var(--border);
-  border-radius:4px;overflow:hidden;
-  box-shadow:0 0 60px rgba(0,0,0,0.8),inset 0 0 40px rgba(0,0,0,0.5);
-  position:relative;
-}
-.title-bar{
-  background:linear-gradient(180deg,#1f1a10,#13100a);
-  border-bottom:2px solid var(--border);
-  padding:0.75rem 1.5rem;
+.header{
+  width:100%;max-width:1100px;
   display:flex;justify-content:space-between;align-items:center;
+  padding:0.5rem 0;margin-bottom:1rem;border-bottom:1px solid var(--border);
 }
-.game-title{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:900;color:var(--gold2);letter-spacing:0.1em;text-shadow:0 0 20px rgba(201,146,10,0.5);}
-.version-new{
-  font-family:monospace;font-size:10px;color:var(--purple);
-  border:1px solid rgba(142,68,173,0.4);padding:3px 10px;border-radius:3px;
-  animation:purpleGlow 2s ease infinite;letter-spacing:0.1em;
+.logo{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.version{font-size:10px;color:var(--muted);border:1px solid var(--border);padding:3px 10px;border-radius:4px;letter-spacing:0.1em;}
+.main{width:100%;max-width:1100px;display:grid;grid-template-columns:560px 1fr;gap:1.25rem;}
+
+/* GAME */
+.game-panel{display:flex;flex-direction:column;gap:0.75rem;}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
+.game-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.game-header{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 1rem;border-bottom:1px solid var(--border);}
+.game-label{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:0.2em;color:var(--muted);}
+.hud{display:flex;gap:1.25rem;}
+.hud-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hud-label{font-size:9px;color:var(--muted);letter-spacing:0.1em;}
+.hud-val{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--accent);}
+.lives-icons{display:flex;gap:3px;}
+.life{color:var(--danger);font-size:11px;}
+canvas{display:block;background:#03020a;}
+
+.overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(3,2,10,0.94);z-index:20;
 }
-@keyframes purpleGlow{0%,100%{box-shadow:0 0 6px rgba(142,68,173,0.2);}50%{box-shadow:0 0 14px rgba(142,68,173,0.5);}}
+.ov-title{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;letter-spacing:0.1em;margin-bottom:0.25rem;text-align:center;}
+.ov-sub{font-size:11px;color:var(--muted);letter-spacing:0.12em;margin-bottom:1.5rem;text-align:center;}
+.ov-score{font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1.25rem;}
+.name-wrap{display:flex;flex-direction:column;align-items:center;gap:0.4rem;margin-bottom:0.75rem;width:240px;}
+.name-wrap label{font-size:10px;color:var(--muted);letter-spacing:0.1em;}
+.name-inp{width:100%;background:rgba(0,0,0,0.5);border:1px solid var(--border);color:var(--text);
+  padding:0.55rem 1rem;font-family:'Share Tech Mono',monospace;font-size:13px;
+  border-radius:6px;outline:none;text-align:center;transition:border-color 0.2s;}
+.name-inp:focus{border-color:var(--gold);}
+.btn-ov{padding:11px 36px;font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:0.12em;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s;margin:3px 0;}
+.btn-green{background:linear-gradient(135deg,var(--accent),#00aaaa);color:#03020a;}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,255,204,0.3);}
+.btn-gold{background:linear-gradient(135deg,#a07800,var(--gold));color:#03020a;}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(240,192,64,0.3);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:8px 28px;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.save-msg{font-size:11px;color:var(--accent);min-height:16px;margin-top:4px;}
 
-.main-layout{display:grid;grid-template-columns:1fr 200px;gap:0;border-bottom:1px solid var(--border);}
-
-.left-panel{border-right:1px solid var(--border);}
-
-.stats-bar{
-  display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:1px;background:var(--border);border-bottom:1px solid var(--border);
-}
-.stat{background:var(--card);padding:0.5rem 0.75rem;display:flex;flex-direction:column;gap:3px;}
-.stat-label{font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
-.stat-val{font-family:'Cinzel',serif;font-size:13px;font-weight:700;}
-.bar-wrap{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;margin-top:2px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:3px;transition:width 0.4s ease;}
-.hp-fill{background:linear-gradient(90deg,#c0392b,#e74c3c);}
-.mp-fill{background:linear-gradient(90deg,#2980b9,#3498db);}
-.xp-fill{background:linear-gradient(90deg,#c9920a,#f0c040);}
-
-.scene{padding:1.25rem;border-bottom:1px solid var(--border);}
-.scene-location{font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;}
-.scene-art{font-size:3rem;text-align:center;padding:0.4rem 0;filter:drop-shadow(0 0 12px rgba(201,146,10,0.3));animation:float 3s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
-.scene-text{font-size:0.9rem;line-height:1.8;color:var(--text);}
-.scene-text .highlight{color:var(--gold2);}
-.scene-text .danger{color:#e74c3c;}
-.scene-text .purple{color:#bb8fce;}
-.log{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:0.4rem 0.7rem;margin-top:0.6rem;font-size:11px;color:var(--muted);min-height:36px;font-style:italic;}
-
-.enemy-section{padding:0 1.25rem 0.75rem;display:none;}
-.enemy-card{background:var(--card);border:1px solid #5a2020;border-radius:3px;padding:0.65rem 0.85rem;display:flex;align-items:center;gap:0.75rem;}
-.enemy-sprite{font-size:2.2rem;animation:shake 0.5s ease infinite alternate;}
-@keyframes shake{0%{transform:rotate(-3deg);}100%{transform:rotate(3deg);}}
-.enemy-name{font-family:'Cinzel',serif;font-size:13px;color:#e74c3c;margin-bottom:3px;}
-.enemy-hp-bar{height:7px;background:rgba(0,0,0,0.5);border-radius:4px;overflow:hidden;}
-.enemy-hp-fill{height:100%;background:linear-gradient(90deg,#922b21,#c0392b);transition:width 0.3s;}
-.boss-card{border-color:#8e44ad!important;}
-.boss-sprite{animation:bossBob 1s ease infinite alternate!important;}
-@keyframes bossBob{0%{transform:scale(1)rotate(-5deg);}100%{transform:scale(1.1)rotate(5deg);}}
-
-.actions{padding:0.75rem 1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
-.btn{
-  background:var(--card);border:1px solid var(--border);color:var(--text);
-  padding:0.55rem 0.8rem;font-family:'IM Fell English',serif;font-size:13px;
-  cursor:pointer;border-radius:3px;transition:all 0.15s;
-  text-align:left;display:flex;align-items:center;gap:7px;
-}
-.btn:hover:not(:disabled){background:#211a0e;border-color:var(--gold);color:var(--gold2);box-shadow:0 0 10px rgba(201,146,10,0.15);}
-.btn:disabled{opacity:0.35;cursor:not-allowed;}
-.btn-icon{font-size:16px;}
-.btn-attack:hover:not(:disabled){border-color:var(--red);color:#e74c3c;box-shadow:0 0 10px rgba(192,57,43,0.2);}
-.btn-skill:hover:not(:disabled){border-color:var(--purple);color:#bb8fce;box-shadow:0 0 10px rgba(142,68,173,0.2);}
-
-/* RIGHT PANEL — NEW IN V2 */
-.right-panel{display:flex;flex-direction:column;}
-.panel-title{
-  font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.15em;
-  color:var(--muted);padding:0.5rem 0.75rem;
-  border-bottom:1px solid var(--border);
-  background:var(--card);
-  text-transform:uppercase;
-  display:flex;align-items:center;gap:6px;
-}
-.new-tag{
-  background:rgba(142,68,173,0.15);border:1px solid rgba(142,68,173,0.3);
-  color:var(--purple);font-size:8px;padding:1px 6px;border-radius:2px;
-}
-
-/* Inventory */
-.inventory{padding:0.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4px;border-bottom:1px solid var(--border);}
-.inv-item{
-  background:rgba(0,0,0,0.3);border:1px solid var(--border);
-  border-radius:3px;padding:5px 6px;
-  font-size:10px;cursor:pointer;transition:all 0.15s;
-  display:flex;flex-direction:column;gap:2px;
-}
-.inv-item:hover{border-color:var(--gold);background:#211a0e;}
-.inv-item.empty{opacity:0.25;cursor:default;}
-.inv-item.empty:hover{border-color:var(--border);background:transparent;}
-.inv-icon{font-size:18px;text-align:center;}
-.inv-name{font-size:9px;color:var(--muted);text-align:center;}
-.inv-count{font-size:9px;color:var(--gold);text-align:center;}
-
-/* Skills */
-.skills{padding:0.5rem;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--border);}
-.skill-item{
-  background:rgba(0,0,0,0.3);border:1px solid var(--border);
-  border-radius:3px;padding:5px 7px;
-  cursor:pointer;transition:all 0.15s;
-  display:flex;align-items:center;gap:6px;
-}
-.skill-item:hover{border-color:rgba(142,68,173,0.5);background:#1a1020;}
-.skill-icon{font-size:15px;}
-.skill-info{flex:1;}
-.skill-name{font-size:10px;color:var(--text);}
-.skill-cost{font-size:9px;color:var(--blue);}
-.skill-item.locked{opacity:0.3;cursor:not-allowed;}
-.skill-item.locked:hover{border-color:var(--border);background:transparent;}
-
-/* Gold */
-.gold-display{padding:0.5rem 0.75rem;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gold2);}
-
-.footer-bar{
-  background:var(--card);border-top:1px solid var(--border);
-  padding:0.4rem 1.5rem;display:flex;justify-content:space-between;
-  font-size:10px;color:var(--muted);font-family:monospace;letter-spacing:0.05em;
-}
-.start-overlay{
-  position:absolute;inset:0;background:rgba(13,10,6,0.97);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:50;padding:2rem;text-align:center;
-}
-.so-title{font-family:'Cinzel',serif;font-size:2.8rem;font-weight:900;color:var(--gold2);letter-spacing:0.1em;text-shadow:0 0 30px rgba(201,146,10,0.6);margin-bottom:0.25rem;}
-.so-sub{color:var(--muted);font-size:12px;letter-spacing:0.1em;margin-bottom:0.5rem;}
-.new-features-list{color:#bb8fce;font-size:12px;margin-bottom:1.5rem;line-height:2;}
-.btn-begin{
-  background:linear-gradient(135deg,#6c3483,#8e44ad);color:#fff;border:none;
-  padding:14px 48px;font-family:'Cinzel',serif;font-size:15px;font-weight:700;
-  letter-spacing:0.15em;border-radius:3px;cursor:pointer;transition:all 0.2s;margin-bottom:1.5rem;
-}
-.btn-begin:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(142,68,173,0.5);}
-.lore{color:var(--muted);font-size:12px;line-height:2;max-width:400px;}
+/* LEADERBOARD */
+.lb-panel{display:flex;flex-direction:column;gap:0.75rem;}
+.stats-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.75rem 1rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;}
+.stat-item{text-align:center;}
+.stat-lbl{font-size:9px;color:var(--muted);letter-spacing:0.1em;margin-bottom:3px;}
+.stat-v{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:var(--accent);}
+.lb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex:1;position:relative;}
+.lb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.lb-hdr{display:flex;justify-content:space-between;align-items:center;padding:0.65rem 1rem;border-bottom:1px solid var(--border);}
+.lb-title{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:0.2em;color:var(--muted);}
+.btn-ref{background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:3px 10px;font-family:'Share Tech Mono',monospace;font-size:10px;border-radius:4px;cursor:pointer;transition:all 0.15s;}
+.btn-ref:hover{border-color:var(--accent);color:var(--accent);}
+.lb-list{padding:0.25rem 0;overflow-y:auto;max-height:380px;}
+.lb-row{display:grid;grid-template-columns:36px 1fr auto 28px;align-items:center;gap:0.5rem;
+  padding:0.55rem 1rem;border-bottom:1px solid rgba(255,255,255,0.02);transition:background 0.15s;
+  animation:rowIn 0.3s ease both;}
+@keyframes rowIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:rgba(255,255,255,0.02);}
+.rank{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;text-align:center;}
+.r1{color:var(--gold2)}.r2{color:#c0c0c0}.r3{color:#cd7f32}.rn{color:var(--muted);}
+.pname{font-size:13px;color:var(--text);}
+.pdate{font-size:9px;color:var(--muted);margin-top:1px;}
+.pscore{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:var(--gold);text-align:right;}
+.btn-del{background:transparent;border:1px solid rgba(255,56,96,0.15);color:rgba(255,56,96,0.4);
+  padding:3px 6px;font-size:10px;border-radius:3px;cursor:pointer;transition:all 0.15s;}
+.btn-del:hover{border-color:var(--danger);color:var(--danger);}
+.lb-empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:12px;line-height:2;}
+.lb-loading{padding:1.5rem;text-align:center;color:var(--muted);font-size:11px;letter-spacing:0.1em;}
+.footer{width:100%;max-width:1100px;margin-top:1rem;font-size:10px;color:var(--muted);
+  letter-spacing:0.06em;border-top:1px solid var(--border);padding-top:0.75rem;
+  display:flex;justify-content:space-between;}
 </style>
 </head>
 <body>
-<div class="game-container">
-  <div class="title-bar">
-    <div class="game-title">⚔ IRON REALM</div>
-    <div class="version-new">✨ v2.0 — AUTO DEPLOYED</div>
-  </div>
 
-  <div class="main-layout">
-    <div class="left-panel">
-      <div class="stats-bar">
-        <div class="stat">
-          <span class="stat-label">❤ Health</span>
-          <span class="stat-val" id="hpVal">100/100</span>
-          <div class="bar-wrap"><div class="bar-fill hp-fill" id="hpBar" style="width:100%"></div></div>
-        </div>
-        <div class="stat">
-          <span class="stat-label">✦ Mana</span>
-          <span class="stat-val" id="mpVal">60/60</span>
-          <div class="bar-wrap"><div class="bar-fill mp-fill" id="mpBar" style="width:100%"></div></div>
-        </div>
-        <div class="stat">
-          <span class="stat-label">★ Lv / XP</span>
-          <span class="stat-val" id="xpVal">Lv.1 — 0</span>
-          <div class="bar-wrap"><div class="bar-fill xp-fill" id="xpBar" style="width:0%"></div></div>
+<div class="header">
+  <div class="logo">⚡ VOID STRIKE</div>
+  <div class="version">v1.0 · Jenkins CI/CD · MongoDB</div>
+</div>
+
+<div class="main">
+  <!-- GAME -->
+  <div class="game-panel">
+    <div class="game-card">
+      <div class="game-header">
+        <div class="game-label">// LIVE GAME</div>
+        <div class="hud">
+          <div class="hud-item"><span class="hud-label">SCORE</span><span class="hud-val" id="scoreHUD">0</span></div>
+          <div class="hud-item"><span class="hud-label">WAVE</span><span class="hud-val" id="waveHUD">1</span></div>
+          <div class="hud-item"><span class="hud-label">LIVES</span><div class="lives-icons" id="livesHUD"></div></div>
         </div>
       </div>
+      <div style="position:relative;">
+        <canvas id="game" width="560" height="400"></canvas>
 
-      <div class="scene">
-        <div class="scene-location" id="location">🏰 THE DARK FOREST — ENTRANCE</div>
-        <div class="scene-art" id="sceneArt">🌲</div>
-        <div class="scene-text" id="sceneText">You stand at the edge of the <span class="highlight">Dark Forest</span>. The trees whisper ancient warnings. A narrow path disappears into the shadows ahead.</div>
-        <div class="log" id="log">Awaiting your command, adventurer...</div>
-      </div>
-
-      <div class="enemy-section" id="enemySection">
-        <div class="enemy-card" id="enemyCard">
-          <div class="enemy-sprite" id="enemySprite">👺</div>
-          <div style="flex:1">
-            <div class="enemy-name" id="enemyName">GOBLIN</div>
-            <div style="font-size:10px;color:var(--muted);margin-bottom:4px;" id="enemyHPText">HP: 30/30</div>
-            <div class="enemy-hp-bar"><div class="enemy-hp-fill" id="enemyHPBar" style="width:100%"></div></div>
+        <!-- START -->
+        <div class="overlay" id="startScreen">
+          <div class="ov-title" style="background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VOID STRIKE</div>
+          <div class="ov-sub">DESTROY ENEMIES · CLIMB THE LEADERBOARD</div>
+          <button class="btn-ov btn-green" id="startBtn">START MISSION</button>
+          <div style="margin-top:1rem;font-size:11px;color:var(--muted);text-align:center;line-height:2;">
+            ← → MOVE &nbsp;|&nbsp; SPACE FIRE<br/>
+            Score auto-saves to MongoDB on game over
           </div>
         </div>
-      </div>
 
-      <div class="actions" id="actions"></div>
-    </div>
-
-    <!-- RIGHT PANEL — NEW IN V2 -->
-    <div class="right-panel">
-      <div class="panel-title">🎒 Inventory <span class="new-tag">NEW</span></div>
-      <div class="inventory" id="inventory">
-        <div class="inv-item" onclick="useItem('potion')" id="inv-potion">
-          <div class="inv-icon">🧪</div>
-          <div class="inv-name">Health Pot</div>
-          <div class="inv-count" id="potionCount">x3</div>
-        </div>
-        <div class="inv-item" onclick="useItem('mana')" id="inv-mana">
-          <div class="inv-icon">💧</div>
-          <div class="inv-name">Mana Elixir</div>
-          <div class="inv-count" id="manaCount">x2</div>
-        </div>
-        <div class="inv-item" onclick="useItem('bomb')" id="inv-bomb">
-          <div class="inv-icon">💣</div>
-          <div class="inv-name">Fire Bomb</div>
-          <div class="inv-count" id="bombCount">x1</div>
-        </div>
-        <div class="inv-item empty">
-          <div class="inv-icon">📦</div>
-          <div class="inv-name">Empty</div>
-          <div class="inv-count">—</div>
-        </div>
-      </div>
-
-      <div class="panel-title">⚡ Skills <span class="new-tag">NEW</span></div>
-      <div class="skills">
-        <div class="skill-item" onclick="useSkill('slash')" title="Powerful slash">
-          <span class="skill-icon">⚔️</span>
-          <div class="skill-info">
-            <div class="skill-name">Power Slash</div>
-            <div class="skill-cost">15 MP · 2x dmg</div>
+        <!-- GAME OVER -->
+        <div class="overlay" id="goScreen" style="display:none;">
+          <div class="ov-title" style="color:var(--danger);">MISSION FAILED</div>
+          <div class="ov-score" id="goScore">SCORE: 0</div>
+          <div class="name-wrap">
+            <label>ENTER NAME TO SAVE SCORE</label>
+            <input class="name-inp" id="nameInp" placeholder="Your name" maxlength="16"/>
           </div>
+          <button class="btn-ov btn-gold" id="saveBtn">SAVE TO LEADERBOARD</button>
+          <button class="btn-ov btn-ghost" id="retryBtn" style="margin-top:6px;">SKIP & RETRY</button>
+          <div class="save-msg" id="saveMsg"></div>
         </div>
-        <div class="skill-item" onclick="useSkill('heal')" title="Heal self">
-          <span class="skill-icon">✨</span>
-          <div class="skill-info">
-            <div class="skill-name">Divine Heal</div>
-            <div class="skill-cost">20 MP · +50 HP</div>
-          </div>
-        </div>
-        <div class="skill-item" onclick="useSkill('meteor')" title="Meteor strike" id="skill-meteor">
-          <span class="skill-icon">☄️</span>
-          <div class="skill-info">
-            <div class="skill-name">Meteor Strike</div>
-            <div class="skill-cost">35 MP · massive</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-title">🏆 Status</div>
-      <div class="gold-display">🪙 <span id="goldVal">0</span> Gold</div>
-      <div style="padding:0 0.75rem 0.5rem;font-size:10px;color:var(--muted);line-height:1.8;">
-        <div>Kills: <span id="killsVal" style="color:var(--text)">0</span></div>
-        <div>Items used: <span id="itemsVal" style="color:var(--text)">0</span></div>
-        <div style="color:#bb8fce;margin-top:4px;font-style:italic;" id="bossHint">Boss awaits...</div>
       </div>
     </div>
   </div>
 
-  <div class="footer-bar">
-    <span>IRON REALM v2.0 ✨</span>
-    <span>Jenkins → GitHub Actions → ECR → K8s · Auto-deployed</span>
-  </div>
-
-  <div class="start-overlay" id="startOverlay">
-    <div class="so-title">⚔ IRON REALM</div>
-    <div class="so-sub">// JENKINS CI/CD AUTO-DEPLOYED — v2.0</div>
-    <div class="new-features-list">
-      ✨ NEW: Inventory System &nbsp;·&nbsp; Skills & Spells<br/>
-      💣 Fire Bombs &nbsp;·&nbsp; ☄️ Meteor Strike<br/>
-      👑 Epic Boss Fight unlocked after 3 kills!
+  <!-- LEADERBOARD -->
+  <div class="lb-panel">
+    <div class="stats-card">
+      <div class="stat-item"><div class="stat-lbl">TOP SCORE</div><div class="stat-v" id="topScore">—</div></div>
+      <div class="stat-item"><div class="stat-lbl">PLAYERS</div><div class="stat-v" id="totalPlayers">—</div></div>
+      <div class="stat-item"><div class="stat-lbl">AVG SCORE</div><div class="stat-v" id="avgScore">—</div></div>
     </div>
-    <button class="btn-begin" id="beginBtn">BEGIN ADVENTURE</button>
-    <div class="lore">The Iron Crown has been corrupted by the Shadow Lord.<br/>Gather your skills, stock your inventory,<br/>and face the darkness that awaits.</div>
+    <div class="lb-card">
+      <div class="lb-hdr">
+        <div class="lb-title">🏆 TOP 10 PLAYERS</div>
+        <button class="btn-ref" onclick="loadScores()">↻ REFRESH</button>
+      </div>
+      <div class="lb-list" id="lbList"><div class="lb-loading">Loading...</div></div>
+    </div>
   </div>
 </div>
 
+<div class="footer">
+  <span>VOID STRIKE v1.0</span>
+  <span>Jenkins → Docker → ECR → GitHub Actions → ArgoCD → K8s → MongoDB</span>
+</div>
+
 <script>
-const G={
-  hp:100,maxHp:100,mp:60,maxMp:60,
-  level:1,xp:0,xpNext:100,gold:0,
-  kills:0,itemsUsed:0,state:'explore',scene:0,enemy:null,
-  inv:{potion:3,mana:2,bomb:1},
-};
+// ── LEADERBOARD ──
+const MEDALS=['🥇','🥈','🥉'];
 
-const ENEMIES=[
-  {name:'GOBLIN SCOUT',sprite:'👺',hp:30,maxHp:30,atk:8,xp:20,gold:5,boss:false},
-  {name:'DARK WOLF',sprite:'🐺',hp:45,maxHp:45,atk:12,xp:35,gold:8,boss:false},
-  {name:'ORC WARRIOR',sprite:'👹',hp:70,maxHp:70,atk:18,xp:60,gold:15,boss:false},
-  {name:'SKELETON MAGE',sprite:'💀',hp:55,maxHp:55,atk:22,xp:75,gold:20,boss:false},
-];
-const BOSS={name:'☠ SHADOW LORD',sprite:'🧟',hp:200,maxHp:200,atk:30,xp:300,gold:100,boss:true};
+async function loadScores(){
+  try{
+    const res=await fetch('/api/scores');
+    const scores=await res.json();
+    if(scores.length){
+      document.getElementById('topScore').textContent=scores[0].score.toLocaleString();
+      document.getElementById('totalPlayers').textContent=scores.length;
+      const avg=Math.round(scores.reduce((a,s)=>a+s.score,0)/scores.length);
+      document.getElementById('avgScore').textContent=avg.toLocaleString();
+    }
+    const list=document.getElementById('lbList');
+    if(!scores.length){list.innerHTML='<div class="lb-empty">No scores yet.<br/>Be the first to play!</div>';return;}
+    list.innerHTML=scores.map((s,i)=>`
+      <div class="lb-row" style="animation-delay:${i*0.04}s">
+        <div class="rank ${i<3?'r'+(i+1):'rn'}">${i<3?MEDALS[i]:'#'+(i+1)}</div>
+        <div><div class="pname">${esc(s.playerName)}</div><div class="pdate">${new Date(s.createdAt).toLocaleDateString()}</div></div>
+        <div class="pscore">${s.score.toLocaleString()}</div>
+        <button class="btn-del" onclick="delScore('${s._id}')">✕</button>
+      </div>`).join('');
+  }catch(e){document.getElementById('lbList').innerHTML='<div class="lb-empty">Failed to load.</div>';}
+}
 
-const SCENES=[
-  {loc:'🌲 DARK FOREST',art:'🌲',text:'You stand at the edge of the <span class="highlight">Dark Forest</span>. Ancient evil stirs in the shadows ahead.',
-   actions:[{icon:'⚔️',label:'Venture deeper',fn:'advance'},{icon:'🔍',label:'Search area',fn:'search'},{icon:'🔥',label:'Fight enemy',fn:'fight'}]},
-  {loc:'🌑 THE CURSED CLEARING',art:'🌕',text:'A moonlit clearing reveals ancient ruins covered in <span class="danger">dark runes</span>. The air crackles with dark energy.',
-   actions:[{icon:'⚔️',label:'Fight the shadow',fn:'fight'},{icon:'🏃',label:'Press onward',fn:'advance'},{icon:'📜',label:'Read the runes',fn:'lore'}]},
-  {loc:'🏰 THE SHADOW KEEP',art:'🏚',text:'The <span class="purple">Shadow Lord\'s keep</span> looms before you. The gate pulses with dark magic. <span class="danger">This is where it ends.</span>',
-   actions:[{icon:'👑',label:'Fight the Boss!',fn:'boss'},{icon:'🧪',label:'Prepare yourself',fn:'prepare'},{icon:'🔮',label:'Cast ward',fn:'ward'}]},
-];
+async function delScore(id){await fetch('/api/scores/'+id,{method:'DELETE'});loadScores();}
+
+async function saveScore(name,score){
+  const res=await fetch('/api/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({playerName:name,score,game:'VOID STRIKE'})});
+  return res.ok;
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+// ── GAME ──
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+const keys={};
+let state='start',score=0,lives=3,wave=1,shootCD=0,eShootT=0;
+let player,bullets,enemies,particles;
+
+function initGame(){
+  score=0;lives=3;wave=1;shootCD=0;eShootT=60;
+  player={x:W/2,y:H-52,spd:5};
+  bullets=[];enemies=[];particles=[];
+  spawnWave();updateHUD();
+}
+
+function spawnWave(){
+  const cols=6,rows=Math.min(2+wave,4);
+  for(let r=0;r<rows;r++)
+    for(let c=0;c<cols;c++)
+      enemies.push({x:52+c*78,y:26+r*44,vx:(wave%2===0?-1:1)*0.55,
+        color:r===0?'#ff3860':r===1?'#ffdd57':'#00ffcc',
+        pts:r===0?30:r===1?20:10,dead:false});
+}
+
+function spawnParts(x,y,col,n=8){
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*3;
+    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:col});}
+}
 
 function updateHUD(){
-  document.getElementById('hpVal').textContent=`${Math.max(0,G.hp)}/${G.maxHp}`;
-  document.getElementById('mpVal').textContent=`${Math.max(0,G.mp)}/${G.maxMp}`;
-  document.getElementById('xpVal').textContent=`Lv.${G.level} — ${G.xp}`;
-  document.getElementById('hpBar').style.width=Math.max(0,G.hp/G.maxHp*100)+'%';
-  document.getElementById('mpBar').style.width=Math.max(0,G.mp/G.maxMp*100)+'%';
-  document.getElementById('xpBar').style.width=Math.min(100,G.xp/G.xpNext*100)+'%';
-  document.getElementById('goldVal').textContent=G.gold;
-  document.getElementById('killsVal').textContent=G.kills;
-  document.getElementById('itemsVal').textContent=G.itemsUsed;
-  document.getElementById('potionCount').textContent='x'+G.inv.potion;
-  document.getElementById('manaCount').textContent='x'+G.inv.mana;
-  document.getElementById('bombCount').textContent='x'+G.inv.bomb;
-  const bh=document.getElementById('bossHint');
-  if(G.kills>=3)bh.textContent='⚠ The Boss stirs...';
-  else bh.textContent=`Boss unlocks at ${3-G.kills} more kills`;
+  document.getElementById('scoreHUD').textContent=score;
+  document.getElementById('waveHUD').textContent=wave;
+  const lh=document.getElementById('livesHUD');lh.innerHTML='';
+  for(let i=0;i<lives;i++){const s=document.createElement('span');s.className='life';s.textContent='▲';lh.appendChild(s);}
 }
 
-function setLog(msg){document.getElementById('log').textContent=msg;}
+function update(){
+  if(state!=='playing')return;
+  shootCD--;
+  if(keys['ArrowLeft']||keys['a'])player.x=Math.max(16,player.x-player.spd);
+  if(keys['ArrowRight']||keys['d'])player.x=Math.min(W-16,player.x+player.spd);
+  if((keys[' ']||keys['ArrowUp'])&&shootCD<=0){bullets.push({x:player.x,y:player.y-15,vy:-9,pl:true});shootCD=13;}
 
-function loadScene(idx){
-  const s=SCENES[Math.min(idx,SCENES.length-1)];
-  document.getElementById('location').textContent=s.loc;
-  document.getElementById('sceneArt').textContent=s.art;
-  document.getElementById('sceneText').innerHTML=s.text;
-  document.getElementById('enemySection').style.display='none';
-  renderActions(s.actions);
-}
+  let flip=false;
+  enemies.forEach(e=>{e.x+=e.vx;if(e.x<14||e.x>W-14)flip=true;});
+  if(flip)enemies.forEach(e=>{e.vx*=-1;e.y+=15;});
 
-function renderActions(acts){
-  const d=document.getElementById('actions');d.innerHTML='';
-  acts.forEach(a=>{
-    const b=document.createElement('button');
-    b.className='btn'+(a.fn==='fight'||a.fn==='attack'||a.fn==='boss'?' btn-attack':a.fn==='skill'?' btn-skill':'');
-    b.innerHTML=`<span class="btn-icon">${a.icon}</span>${a.label}`;
-    if(a.fn==='boss'&&G.kills<3){b.disabled=true;b.title='Defeat 3 enemies first';}
-    b.onclick=()=>ACTIONS[a.fn]&&ACTIONS[a.fn]();
-    d.appendChild(b);
+  eShootT--;
+  if(eShootT<=0){
+    const alive=enemies.filter(e=>!e.dead);
+    if(alive.length){const e=alive[Math.floor(Math.random()*alive.length)];bullets.push({x:e.x,y:e.y+12,vy:4+wave*0.3,pl:false});}
+    eShootT=Math.max(18,58-wave*4);
+  }
+
+  bullets.forEach(b=>b.y+=b.vy);
+  bullets=bullets.filter(b=>b.y>-20&&b.y<H+20);
+
+  bullets.filter(b=>b.pl).forEach(b=>{
+    enemies.forEach(e=>{
+      if(!b.dead&&!e.dead&&Math.abs(b.x-e.x)<17&&Math.abs(b.y-e.y)<13){
+        spawnParts(e.x,e.y,e.color);score+=e.pts;b.dead=true;e.dead=true;updateHUD();
+      }
+    });
   });
+  bullets=bullets.filter(b=>!b.dead);
+  enemies=enemies.filter(e=>!e.dead);
+
+  bullets.filter(b=>!b.pl).forEach(b=>{
+    if(Math.abs(b.x-player.x)<17&&Math.abs(b.y-player.y)<17){
+      spawnParts(player.x,player.y,'#ff3860');b.dead=true;lives--;updateHUD();
+      if(lives<=0)endGame();
+    }
+  });
+  bullets=bullets.filter(b=>!b.dead);
+
+  if(enemies.some(e=>e.y>H-32)){lives=0;updateHUD();endGame();}
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life-=0.04;});
+  particles=particles.filter(p=>p.life>0);
+  if(!enemies.length){wave++;spawnWave();}
 }
 
-function spawnEnemy(isBoss=false){
-  const e=isBoss?{...BOSS}:{...ENEMIES[Math.floor(Math.random()*ENEMIES.length)]};
-  G.enemy=e;
-  const sec=document.getElementById('enemySection');
-  sec.style.display='block';
-  const card=document.getElementById('enemyCard');
-  card.className='enemy-card'+(isBoss?' boss-card':'');
-  document.getElementById('enemySprite').textContent=e.sprite;
-  document.getElementById('enemySprite').className='enemy-sprite'+(isBoss?' boss-sprite':'');
-  document.getElementById('enemyName').textContent=e.name;
-  updateEnemyHP();G.state='battle';
-  renderActions([
-    {icon:'⚔️',label:'Attack',fn:'attack'},
-    {icon:'🗡️',label:'Power Slash',fn:'pslash'},
-    {icon:'🧪',label:'Use item',fn:'openInv'},
-    {icon:'🏃',label:'Flee',fn:'flee'},
-  ]);
+const STARS=Array.from({length:120},()=>({x:Math.random()*560,y:Math.random()*400,r:Math.random()*1.2,s:Math.random()*0.3+0.1}));
+function drawStars(){
+  STARS.forEach(s=>{s.y+=s.s;if(s.y>400){s.y=0;s.x=Math.random()*560;}
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,210,255,${0.3+s.r*0.2})`;ctx.fill();});
 }
 
-function updateEnemyHP(){
-  const pct=Math.max(0,G.enemy.hp/G.enemy.maxHp*100);
-  document.getElementById('enemyHPBar').style.width=pct+'%';
-  document.getElementById('enemyHPText').textContent=`HP: ${Math.max(0,G.enemy.hp)}/${G.enemy.maxHp}`;
+function draw(){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#03020a';ctx.fillRect(0,0,W,H);
+  drawStars();
+  if(state!=='playing')return;
+
+  // Player
+  ctx.save();ctx.translate(player.x,player.y);
+  ctx.shadowBlur=12;ctx.shadowColor='#00ffcc';ctx.fillStyle='#00ffcc';
+  ctx.beginPath();ctx.moveTo(0,-15);ctx.lineTo(12,10);ctx.lineTo(5,5);ctx.lineTo(-5,5);ctx.lineTo(-12,10);
+  ctx.closePath();ctx.fill();ctx.restore();
+
+  // Enemies
+  enemies.forEach(e=>{
+    ctx.save();ctx.translate(e.x,e.y);
+    ctx.shadowBlur=8;ctx.shadowColor=e.color;ctx.fillStyle=e.color;
+    ctx.beginPath();ctx.moveTo(0,9);ctx.lineTo(10,-6);ctx.lineTo(5,-2);ctx.lineTo(-5,-2);ctx.lineTo(-10,-6);
+    ctx.closePath();ctx.fill();ctx.restore();
+  });
+
+  // Bullets
+  bullets.forEach(b=>{
+    ctx.shadowBlur=7;ctx.shadowColor=b.pl?'#00ffcc':'#ff3860';
+    ctx.fillStyle=b.pl?'#00ffcc':'#ff3860';
+    ctx.fillRect(b.x-1.5,b.y-5,3,10);ctx.shadowBlur=0;
+  });
+
+  // Particles
+  particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
+    ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
 }
 
-function enemyAttack(){
-  const dmg=G.enemy.atk+Math.floor(Math.random()*8)-3;
-  G.hp=Math.max(0,G.hp-dmg);
-  setLog(`${G.enemy.name} strikes you for ${dmg} damage!`);
-  updateHUD();
-  if(G.hp<=0){setLog('⚰ You have fallen...');renderActions([{icon:'🔄',label:'Rise again',fn:'restart'}]);}
+function endGame(){
+  state='gameover';
+  document.getElementById('goScore').textContent='SCORE: '+score.toLocaleString();
+  document.getElementById('goScreen').style.display='flex';
+  document.getElementById('saveMsg').textContent='';
+  document.getElementById('nameInp').value='';
+  loadScores();
 }
 
-function defeatEnemy(){
-  G.kills++;G.gold+=G.enemy.gold;gainXP(G.enemy.xp);
-  setLog(`✅ ${G.enemy.name} defeated! +${G.enemy.xp} XP, +${G.enemy.gold} gold`);
-  document.getElementById('enemySection').style.display='none';
-  G.state='explore';loadScene(G.scene);updateHUD();
-}
+function gameLoop(){update();draw();requestAnimationFrame(gameLoop);}
 
-function gainXP(amt){
-  G.xp+=amt;
-  if(G.xp>=G.xpNext){
-    G.level++;G.xp=0;G.xpNext=Math.floor(G.xpNext*1.5);
-    G.maxHp+=20;G.hp=G.maxHp;G.maxMp+=15;G.mp=G.maxMp;
-    setLog(`⭐ LEVEL UP! Now Level ${G.level}! HP & MP fully restored!`);
-  }
-  updateHUD();
-}
+document.addEventListener('keydown',e=>{keys[e.key]=true;if([' ','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();});
+document.addEventListener('keyup',e=>{keys[e.key]=false;});
 
-function useItem(type){
-  if(G.inv[type]<=0){setLog('❌ None left!');return;}
-  G.inv[type]--;G.itemsUsed++;
-  if(type==='potion'){G.hp=Math.min(G.maxHp,G.hp+40);setLog('🧪 Health potion! +40 HP');}
-  else if(type==='mana'){G.mp=Math.min(G.maxMp,G.mp+30);setLog('💧 Mana elixir! +30 MP');}
-  else if(type==='bomb'){
-    if(G.state==='battle'&&G.enemy){
-      const dmg=50+Math.floor(Math.random()*20);
-      G.enemy.hp=Math.max(0,G.enemy.hp-dmg);updateEnemyHP();
-      setLog(`💣 BOOM! Fire bomb deals ${dmg} damage!`);
-      if(G.enemy.hp<=0)defeatEnemy();else enemyAttack();
-    } else {setLog('💣 Save the bomb for battle!');}
-  }
-  updateHUD();
-}
-
-function useSkill(sk){
-  if(sk==='slash'){
-    if(G.mp<15){setLog('❌ Not enough mana for Power Slash!');return;}
-    if(G.state!=='battle'){setLog('⚔️ No enemy to slash!');return;}
-    G.mp-=15;
-    const dmg=(10+G.level*3)*2+Math.floor(Math.random()*10);
-    G.enemy.hp=Math.max(0,G.enemy.hp-dmg);updateEnemyHP();updateHUD();
-    setLog(`⚔️ Power Slash hits for ${dmg} damage!`);
-    if(G.enemy.hp<=0)defeatEnemy();else enemyAttack();
-  } else if(sk==='heal'){
-    if(G.mp<20){setLog('❌ Not enough mana!');return;}
-    G.mp-=20;G.hp=Math.min(G.maxHp,G.hp+50);updateHUD();
-    setLog('✨ Divine Heal restores 50 HP!');
-  } else if(sk==='meteor'){
-    if(G.mp<35){setLog('❌ Not enough mana for Meteor Strike!');return;}
-    if(G.state!=='battle'){setLog('☄️ No enemy to strike!');return;}
-    G.mp-=35;
-    const dmg=80+G.level*10+Math.floor(Math.random()*30);
-    G.enemy.hp=Math.max(0,G.enemy.hp-dmg);updateEnemyHP();updateHUD();
-    setLog(`☄️ METEOR STRIKE! Massive ${dmg} damage!`);
-    if(G.enemy.hp<=0)defeatEnemy();else enemyAttack();
-  }
-}
-
-const ACTIONS={
-  advance(){G.scene=Math.min(G.scene+1,SCENES.length-1);loadScene(G.scene);setLog('You press deeper into the darkness...');},
-  search(){
-    const r=Math.random();
-    if(r<0.3){G.inv.potion++;setLog('🧪 Found a health potion!');}
-    else if(r<0.5){G.gold+=15;setLog('🪙 Found 15 gold!');}
-    else if(r<0.65){G.inv.mana++;setLog('💧 Found a mana elixir!');}
-    else setLog('Nothing here but shadows...');
-    updateHUD();
-  },
-  rest(){G.hp=Math.min(G.maxHp,G.hp+20);G.mp=Math.min(G.maxMp,G.mp+15);setLog('🔥 Rested. +20 HP, +15 MP');updateHUD();},
-  fight(){spawnEnemy(false);setLog(`A ${G.enemy.name} appears!`);},
-  boss(){
-    if(G.kills<3){setLog('⚠ Defeat 3 enemies first to face the boss!');return;}
-    spawnEnemy(true);setLog('👑 THE SHADOW LORD awakens! This is the final battle!');
-  },
-  lore(){setLog('📜 "Only by blade and will may the Shadow Crown fall..."');},
-  prepare(){G.hp=Math.min(G.maxHp,G.hp+30);G.mp=Math.min(G.maxMp,G.mp+20);setLog('🧘 You prepare yourself. +30 HP, +20 MP');updateHUD();},
-  ward(){G.mp=Math.min(G.maxMp,G.mp+25);setLog('🔮 Protective ward cast. +25 MP');updateHUD();},
-  attack(){
-    const dmg=10+G.level*3+Math.floor(Math.random()*8);
-    G.enemy.hp=Math.max(0,G.enemy.hp-dmg);updateEnemyHP();
-    setLog(`⚔️ You strike for ${dmg} damage!`);
-    if(G.enemy.hp<=0)defeatEnemy();else enemyAttack();
-  },
-  pslash(){useSkill('slash');},
-  openInv(){setLog('🎒 Use an item from the inventory panel on the right!');},
-  flee(){G.state='explore';document.getElementById('enemySection').style.display='none';loadScene(G.scene);setLog('🏃 You flee into the shadows...');},
-  restart(){G.hp=G.maxHp;G.mp=G.maxMp;G.state='explore';updateHUD();loadScene(G.scene);setLog('You rise again...');},
+document.getElementById('startBtn').onclick=()=>{
+  document.getElementById('startScreen').style.display='none';
+  state='playing';initGame();
 };
 
-document.getElementById('beginBtn').onclick=()=>{
-  document.getElementById('startOverlay').style.display='none';
-  loadScene(0);updateHUD();
+document.getElementById('retryBtn').onclick=()=>{
+  document.getElementById('goScreen').style.display='none';
+  state='playing';initGame();
 };
-updateHUD();
+
+document.getElementById('saveBtn').onclick=async()=>{
+  const name=document.getElementById('nameInp').value.trim();
+  const msg=document.getElementById('saveMsg');
+  if(!name){msg.style.color='#ff3860';msg.textContent='Enter your name!';return;}
+  msg.style.color='var(--accent)';msg.textContent='Saving...';
+  const ok=await saveScore(name,score);
+  if(ok){
+    msg.textContent='✅ Saved! Restarting...';
+    loadScores();
+    setTimeout(()=>{document.getElementById('goScreen').style.display='none';state='playing';initGame();},2000);
+  }else{msg.style.color='#ff3860';msg.textContent='Failed. Try again.';}
+};
+
+loadScores();
+setInterval(loadScores,30000);
+gameLoop();
 </script>
 </body>
 </html>
