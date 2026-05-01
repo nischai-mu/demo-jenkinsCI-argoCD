@@ -7,7 +7,7 @@ const PORT = 3000;
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname));
 
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI || "mongodb://mongo-service:27017/leaderboard";
@@ -70,7 +70,7 @@ app.get("/health", (req, res) => {
 
 // Serve frontend
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, () => {
