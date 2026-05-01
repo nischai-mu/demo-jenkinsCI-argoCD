@@ -2,9 +2,9 @@
   "name": "game-leaderboard",
   "version": "1.0.0",
   "description": "Game leaderboard app with MongoDB",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
