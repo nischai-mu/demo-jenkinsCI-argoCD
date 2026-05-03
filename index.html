@@ -10,7 +10,7 @@
 :root{
   --bg:#03020a;--surface:#0a0914;--card:#0f0e1c;--border:#1a1830;
   --gold:#f0c040;--gold2:#ffd700;--accent:#00ffcc;--danger:#ff3860;
-  --text:#e8e0ff;--muted:#4a4560;
+  --purple:#9b59b6;--text:#e8e0ff;--muted:#4a4560;
 }
 body{
   background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;
@@ -18,7 +18,7 @@ body{
   padding:1rem;
   background-image:
     radial-gradient(ellipse at 20% 20%,rgba(0,255,204,0.04) 0%,transparent 50%),
-    radial-gradient(ellipse at 80% 80%,rgba(240,192,64,0.04) 0%,transparent 50%);
+    radial-gradient(ellipse at 80% 80%,rgba(240,192,64,0.05) 0%,transparent 50%);
 }
 .header{
   width:100%;max-width:1100px;
@@ -28,10 +28,19 @@ body{
 .logo{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;
   background:linear-gradient(135deg,var(--accent),var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.version{font-size:10px;color:var(--muted);border:1px solid var(--border);padding:3px 10px;border-radius:4px;letter-spacing:0.1em;}
+.version-badge{
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;color:var(--purple);
+  border:1px solid rgba(155,89,182,0.35);padding:3px 12px;border-radius:4px;letter-spacing:0.1em;
+  animation:purpGlow 2s ease infinite;
+}
+@keyframes purpGlow{0%,100%{box-shadow:0 0 6px rgba(155,89,182,0.15);}50%{box-shadow:0 0 14px rgba(155,89,182,0.4);}}
+.new-dot{width:6px;height:6px;background:var(--purple);border-radius:50%;animation:blink 1.5s ease infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
 .main{width:100%;max-width:1100px;display:grid;grid-template-columns:560px 1fr;gap:1.25rem;}
 
-/* GAME */
+/* GAME — same as v1 */
 .game-panel{display:flex;flex-direction:column;gap:0.75rem;}
 .game-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
 .game-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
@@ -44,12 +53,7 @@ body{
 .lives-icons{display:flex;gap:3px;}
 .life{color:var(--danger);font-size:11px;}
 canvas{display:block;background:#03020a;}
-
-.overlay{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  background:rgba(3,2,10,0.94);z-index:20;
-}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(3,2,10,0.94);z-index:20;}
 .ov-title{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;letter-spacing:0.1em;margin-bottom:0.25rem;text-align:center;}
 .ov-sub{font-size:11px;color:var(--muted);letter-spacing:0.12em;margin-bottom:1.5rem;text-align:center;}
 .ov-score{font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--gold);margin-bottom:1.25rem;}
@@ -82,7 +86,25 @@ canvas{display:block;background:#03020a;}
 .btn-ref{background:transparent;border:1px solid var(--border);color:var(--muted);
   padding:3px 10px;font-family:'Share Tech Mono',monospace;font-size:10px;border-radius:4px;cursor:pointer;transition:all 0.15s;}
 .btn-ref:hover{border-color:var(--accent);color:var(--accent);}
-.lb-list{padding:0.25rem 0;overflow-y:auto;max-height:380px;}
+
+/* ── NEW IN V2: Filter bar ── */
+.filter-bar{
+  display:flex;gap:6px;padding:0.6rem 1rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(155,89,182,0.04);
+}
+.filter-label{font-size:9px;color:var(--muted);letter-spacing:0.1em;align-self:center;margin-right:4px;}
+.filter-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:3px 12px;font-family:'Share Tech Mono',monospace;font-size:10px;
+  border-radius:4px;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;
+}
+.filter-btn:hover{border-color:var(--purple);color:var(--purple);}
+.filter-btn.active{background:rgba(155,89,182,0.15);border-color:var(--purple);color:var(--purple);}
+.new-tag{font-size:8px;background:rgba(155,89,182,0.15);border:1px solid rgba(155,89,182,0.3);
+  color:var(--purple);padding:1px 5px;border-radius:2px;margin-left:4px;vertical-align:middle;}
+
+.lb-list{padding:0.25rem 0;overflow-y:auto;max-height:340px;}
 .lb-row{display:grid;grid-template-columns:36px 1fr auto 28px;align-items:center;gap:0.5rem;
   padding:0.55rem 1rem;border-bottom:1px solid rgba(255,255,255,0.02);transition:background 0.15s;
   animation:rowIn 0.3s ease both;}
@@ -98,7 +120,7 @@ canvas{display:block;background:#03020a;}
   padding:3px 6px;font-size:10px;border-radius:3px;cursor:pointer;transition:all 0.15s;}
 .btn-del:hover{border-color:var(--danger);color:var(--danger);}
 .lb-empty{padding:2.5rem;text-align:center;color:var(--muted);font-size:12px;line-height:2;}
-.lb-loading{padding:1.5rem;text-align:center;color:var(--muted);font-size:11px;letter-spacing:0.1em;}
+
 .footer{width:100%;max-width:1100px;margin-top:1rem;font-size:10px;color:var(--muted);
   letter-spacing:0.06em;border-top:1px solid var(--border);padding-top:0.75rem;
   display:flex;justify-content:space-between;}
@@ -108,7 +130,7 @@ canvas{display:block;background:#03020a;}
 
 <div class="header">
   <div class="logo">⚡ VOID STRIKE</div>
-  <div class="version">v1.0 · Jenkins CI/CD · MongoDB</div>
+  <div class="version-badge"><span class="new-dot"></span> v2.0 — AUTO DEPLOYED</div>
 </div>
 
 <div class="main">
@@ -125,8 +147,6 @@ canvas{display:block;background:#03020a;}
       </div>
       <div style="position:relative;">
         <canvas id="game" width="560" height="400"></canvas>
-
-        <!-- START -->
         <div class="overlay" id="startScreen">
           <div class="ov-title" style="background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">VOID STRIKE</div>
           <div class="ov-sub">DESTROY ENEMIES · CLIMB THE LEADERBOARD</div>
@@ -136,8 +156,6 @@ canvas{display:block;background:#03020a;}
             Score auto-saves to MongoDB on game over
           </div>
         </div>
-
-        <!-- GAME OVER -->
         <div class="overlay" id="goScreen" style="display:none;">
           <div class="ov-title" style="color:var(--danger);">MISSION FAILED</div>
           <div class="ov-score" id="goScore">SCORE: 0</div>
@@ -162,43 +180,64 @@ canvas{display:block;background:#03020a;}
     </div>
     <div class="lb-card">
       <div class="lb-hdr">
-        <div class="lb-title">🏆 TOP 10 PLAYERS</div>
+        <div class="lb-title">🏆 LEADERBOARD <span class="new-tag">v2</span></div>
         <button class="btn-ref" onclick="loadScores()">↻ REFRESH</button>
       </div>
-      <div class="lb-list" id="lbList"><div class="lb-loading">Loading...</div></div>
+      <!-- NEW IN V2: Filter bar -->
+      <div class="filter-bar">
+        <span class="filter-label">SHOW:</span>
+        <button class="filter-btn active" onclick="setFilter(3,this)">TOP 3</button>
+        <button class="filter-btn" onclick="setFilter(5,this)">TOP 5</button>
+        <button class="filter-btn" onclick="setFilter(10,this)">TOP 10</button>
+        <button class="filter-btn" onclick="setFilter(0,this)">ALL TIME</button>
+      </div>
+      <div class="lb-list" id="lbList"><div class="lb-empty">Loading...</div></div>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  <span>VOID STRIKE v1.0</span>
+  <span>VOID STRIKE v2.0 ✨</span>
   <span>Jenkins → Docker → ECR → GitHub Actions → ArgoCD → K8s → MongoDB</span>
 </div>
 
 <script>
-// ── LEADERBOARD ──
 const MEDALS=['🥇','🥈','🥉'];
+let allScores=[];
+let filterLimit=3;
+
+function setFilter(n,btn){
+  filterLimit=n;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderScores();
+}
 
 async function loadScores(){
   try{
     const res=await fetch('/api/scores');
-    const scores=await res.json();
-    if(scores.length){
-      document.getElementById('topScore').textContent=scores[0].score.toLocaleString();
-      document.getElementById('totalPlayers').textContent=scores.length;
-      const avg=Math.round(scores.reduce((a,s)=>a+s.score,0)/scores.length);
+    allScores=await res.json();
+    if(allScores.length){
+      document.getElementById('topScore').textContent=allScores[0].score.toLocaleString();
+      document.getElementById('totalPlayers').textContent=allScores.length;
+      const avg=Math.round(allScores.reduce((a,s)=>a+s.score,0)/allScores.length);
       document.getElementById('avgScore').textContent=avg.toLocaleString();
     }
-    const list=document.getElementById('lbList');
-    if(!scores.length){list.innerHTML='<div class="lb-empty">No scores yet.<br/>Be the first to play!</div>';return;}
-    list.innerHTML=scores.map((s,i)=>`
-      <div class="lb-row" style="animation-delay:${i*0.04}s">
-        <div class="rank ${i<3?'r'+(i+1):'rn'}">${i<3?MEDALS[i]:'#'+(i+1)}</div>
-        <div><div class="pname">${esc(s.playerName)}</div><div class="pdate">${new Date(s.createdAt).toLocaleDateString()}</div></div>
-        <div class="pscore">${s.score.toLocaleString()}</div>
-        <button class="btn-del" onclick="delScore('${s._id}')">✕</button>
-      </div>`).join('');
+    renderScores();
   }catch(e){document.getElementById('lbList').innerHTML='<div class="lb-empty">Failed to load.</div>';}
+}
+
+function renderScores(){
+  const list=document.getElementById('lbList');
+  const scores=filterLimit===0?allScores:allScores.slice(0,filterLimit);
+  if(!scores.length){list.innerHTML='<div class="lb-empty">No scores yet.<br/>Be the first to play!</div>';return;}
+  list.innerHTML=scores.map((s,i)=>`
+    <div class="lb-row" style="animation-delay:${i*0.05}s">
+      <div class="rank ${i<3?'r'+(i+1):'rn'}">${i<3?MEDALS[i]:'#'+(i+1)}</div>
+      <div><div class="pname">${esc(s.playerName)}</div><div class="pdate">${new Date(s.createdAt).toLocaleDateString()}</div></div>
+      <div class="pscore">${s.score.toLocaleString()}</div>
+      <button class="btn-del" onclick="delScore('${s._id}')">✕</button>
+    </div>`).join('');
 }
 
 async function delScore(id){await fetch('/api/scores/'+id,{method:'DELETE'});loadScores();}
@@ -210,7 +249,7 @@ async function saveScore(name,score){
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
-// ── GAME ──
+// ── GAME (same engine as v1) ──
 const canvas=document.getElementById('game');
 const ctx=canvas.getContext('2d');
 const W=canvas.width,H=canvas.height;
@@ -234,8 +273,8 @@ function spawnWave(){
         pts:r===0?30:r===1?20:10,dead:false});
 }
 
-function spawnParts(x,y,col,n=8){
-  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*3;
+function spawnParts(x,y,col){
+  for(let i=0;i<8;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*3;
     particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:col});}
 }
 
@@ -302,29 +341,21 @@ function draw(){
   ctx.clearRect(0,0,W,H);ctx.fillStyle='#03020a';ctx.fillRect(0,0,W,H);
   drawStars();
   if(state!=='playing')return;
-
-  // Player
   ctx.save();ctx.translate(player.x,player.y);
   ctx.shadowBlur=12;ctx.shadowColor='#00ffcc';ctx.fillStyle='#00ffcc';
   ctx.beginPath();ctx.moveTo(0,-15);ctx.lineTo(12,10);ctx.lineTo(5,5);ctx.lineTo(-5,5);ctx.lineTo(-12,10);
   ctx.closePath();ctx.fill();ctx.restore();
-
-  // Enemies
   enemies.forEach(e=>{
     ctx.save();ctx.translate(e.x,e.y);
     ctx.shadowBlur=8;ctx.shadowColor=e.color;ctx.fillStyle=e.color;
     ctx.beginPath();ctx.moveTo(0,9);ctx.lineTo(10,-6);ctx.lineTo(5,-2);ctx.lineTo(-5,-2);ctx.lineTo(-10,-6);
     ctx.closePath();ctx.fill();ctx.restore();
   });
-
-  // Bullets
   bullets.forEach(b=>{
     ctx.shadowBlur=7;ctx.shadowColor=b.pl?'#00ffcc':'#ff3860';
     ctx.fillStyle=b.pl?'#00ffcc':'#ff3860';
     ctx.fillRect(b.x-1.5,b.y-5,3,10);ctx.shadowBlur=0;
   });
-
-  // Particles
   particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
     ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;});
 }
@@ -343,27 +374,16 @@ function gameLoop(){update();draw();requestAnimationFrame(gameLoop);}
 document.addEventListener('keydown',e=>{keys[e.key]=true;if([' ','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();});
 document.addEventListener('keyup',e=>{keys[e.key]=false;});
 
-document.getElementById('startBtn').onclick=()=>{
-  document.getElementById('startScreen').style.display='none';
-  state='playing';initGame();
-};
-
-document.getElementById('retryBtn').onclick=()=>{
-  document.getElementById('goScreen').style.display='none';
-  state='playing';initGame();
-};
-
+document.getElementById('startBtn').onclick=()=>{document.getElementById('startScreen').style.display='none';state='playing';initGame();};
+document.getElementById('retryBtn').onclick=()=>{document.getElementById('goScreen').style.display='none';state='playing';initGame();};
 document.getElementById('saveBtn').onclick=async()=>{
   const name=document.getElementById('nameInp').value.trim();
   const msg=document.getElementById('saveMsg');
   if(!name){msg.style.color='#ff3860';msg.textContent='Enter your name!';return;}
   msg.style.color='var(--accent)';msg.textContent='Saving...';
   const ok=await saveScore(name,score);
-  if(ok){
-    msg.textContent='✅ Saved! Restarting...';
-    loadScores();
-    setTimeout(()=>{document.getElementById('goScreen').style.display='none';state='playing';initGame();},2000);
-  }else{msg.style.color='#ff3860';msg.textContent='Failed. Try again.';}
+  if(ok){msg.textContent='✅ Saved!';loadScores();setTimeout(()=>{document.getElementById('goScreen').style.display='none';state='playing';initGame();},2000);}
+  else{msg.style.color='#ff3860';msg.textContent='Failed. Try again.';}
 };
 
 loadScores();
